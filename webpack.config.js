@@ -5,6 +5,7 @@ var ROOT_PATH = path.resolve(__dirname);
 var ENTRY_PATH = path.resolve(ROOT_PATH, 'src/js/main.js');
 var SRC_PATH = path.resolve(ROOT_PATH, 'src');
 var JS_PATH = path.resolve(ROOT_PATH, 'src/js');
+var ASSETS_PATH = path.resolve(ROOT_PATH, 'assets');
 var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
 var SHADER_PATH = path.resolve(ROOT_PATH, 'src/shaders');
 var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
@@ -26,7 +27,7 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
-        modules: [JS_PATH, SRC_PATH]
+        modules: [JS_PATH, SRC_PATH, ROOT_PATH]
     },
     module: {
         rules: [
@@ -46,7 +47,14 @@ module.exports = {
                 test: /\.glsl$/,
                 include: SHADER_PATH,
                 use: {
-                    loader: 'webpack-glsl'
+                    loader: 'webpack-glsl-loader'
+                }
+            },
+            {
+                test: /\.(png|svg|jpg|gif)$/,
+                include: ASSETS_PATH,
+                use: {
+                    loader: 'file-loader'
                 }
             }
         ]

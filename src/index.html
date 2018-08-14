@@ -7,10 +7,20 @@
     <title>
         <%= htmlWebpackPlugin.options.title %>
     </title>
+
+    <style>
+        #canvas {
+            display: block;
+            margin: 0 auto;
+            border: 2px solid black;
+        }
+    </style>
 </head>
 
 <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas" width=600 height=600>
+        Your browser does not support HTML5
+    </canvas>
 </body>
 
 </html>
