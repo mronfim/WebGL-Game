@@ -1,6 +1,10 @@
+import log from 'node_modules/loglevel'
+import TransformComponent from 'core/transform'
+
 const Entity = function Entity() {
     this.id = (+new Date()).toString(16) + (Math.random() * 100000000 | 0).toString(16) + Entity.prototype._count++
     this.components = {}
+    this.addComponent(new TransformComponent())
     return this
 }
 
@@ -17,7 +21,12 @@ Entity.prototype.removeComponent = function removeComponent(componentName) {
         name = componentName.prototype.name
     }
 
-    delete this.components[name]
+    if (name === 'transform') {
+        log.warn('WARNING cannot remove transform component from entity!')
+    } else {
+        delete this.components[name]
+    }
+
     return this
 }
 

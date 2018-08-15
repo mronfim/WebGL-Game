@@ -70,6 +70,8 @@ window.addEventListener('load', () => {
     entities[player.id] = player
     // =============================================
 
+    console.log(player)
+
     //
     // Main render loop
     //
@@ -80,6 +82,6 @@ window.addEventListener('load', () => {
 
         requestAnimationFrame(loop)
     }
-
+    
     requestAnimationFrame(loop)
 })
