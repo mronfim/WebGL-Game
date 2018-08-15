@@ -37,7 +37,7 @@ SpriteComponent.prototype.setup = function setup() {
 
     this.tex_buff = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, this.tex_buff)
-    gl.bufferData(gl.ARRAY_BUFFER, createRectArray(0, 1, 1, -1), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, createRectArray(), gl.STATIC_DRAW)
 
     this.geo_buff = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff)

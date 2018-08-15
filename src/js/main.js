@@ -2,6 +2,8 @@ import {
     createShaderProgram,
 } from 'lib/gl-utils.js'
 
+import * as glm from 'lib/gl-matrix.js'
+
 import Entity from 'core/entity.js'
 import SpriteComponent from 'core/sprite.js'
 import RenderSystem from 'core/render.js'
