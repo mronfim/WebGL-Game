@@ -37,6 +37,7 @@ window.addEventListener('load', () => {
 
     // =============================================
     // Initialize Game Objects
+    
     let entities = {}
 
     let player = new Entity()
