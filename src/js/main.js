@@ -2,7 +2,9 @@ import {
     createShaderProgram,
 } from 'lib/gl-utils.js'
 
-import { Sprite } from 'gfx/material.js'
+import Entity from 'core/entity.js'
+import SpriteComponent from 'core/sprite.js'
+import RenderSystem from 'core/render.js'
 
 import VertShaderSource from 'shaders/vertex.glsl'
 import FragShaderSource from 'shaders/fragment.glsl'
@@ -26,6 +28,8 @@ window.addEventListener('load', () => {
     if (!gl) {
         alert('Your browser does not support WebGL')
     }
+
+    window.gl = gl
 
     gl.viewport(0, 0, canvas.width, canvas.height)
     gl.enable(gl.BLEND)
@@ -56,22 +60,23 @@ window.addEventListener('load', () => {
     gl.enableVertexAttribArray(positionAttribLocation)
     gl.enableVertexAttribArray(colorAttribLocation)
 
-    let sprite = new Sprite(gl, '/assets/Sprite-0002.png', spriteVert, spriteFrag)
+    // =============================================
+    // Initialize Game Objects
+    let entities = {}
+
+    let player = new Entity()
+    player.addComponent(new SpriteComponent('/assets/Sprite-0002.png', spriteVert, spriteFrag))
+
+    entities[player.id] = player
+    // =============================================
 
     //
     // Main render loop
     //
 
     function loop() {
-        gl.clearColor(0.75, 0.85, 0.8, 1.0)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-        // gl.useProgram(program)
-        // gl.drawArrays(gl.TRIANGLES, 0, 3)
-
-        sprite.render()
-
-        gl.flush()
+        RenderSystem(entities)
 
         requestAnimationFrame(loop)
     }
