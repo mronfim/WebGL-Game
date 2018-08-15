@@ -1,13 +1,30 @@
 import { createShaderProgram } from 'lib/gl-utils.js'
 
-const createRectArray = (x = 0, y = 0, w = 1, h = 1) => {
+const createGeoArray = (x = 0, y = 0, w = 1, h = 1) => {
+    return new Float32Array([
+        // x, y,
+        // x + w, y,
+        // x, y + h,
+        // x, y + h,
+        // x + w, y,
+        // x + w, y + h
+        -0.5, -0.5,
+        0.5, -0.5,
+        -0.5, 0.5,
+        -0.5, 0.5,
+        0.5, -0.5,
+        0.5, 0.5,
+    ])
+}
+
+const createTexArray = (x = 0, y = 0, w = 1, h = 1) => {
     return new Float32Array([
         x, y,
         x + w, y,
         x, y + h,
         x, y + h,
         x + w, y,
-        x + w, y + h
+        x + w, y + h,
     ])
 }
 
@@ -37,11 +54,11 @@ SpriteComponent.prototype.setup = function setup() {
 
     this.tex_buff = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, this.tex_buff)
-    gl.bufferData(gl.ARRAY_BUFFER, createRectArray(), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, createTexArray(), gl.STATIC_DRAW)
 
     this.geo_buff = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff)
-    gl.bufferData(gl.ARRAY_BUFFER, createRectArray(), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, createGeoArray(), gl.STATIC_DRAW)
 
     this.aPositionLoc = gl.getAttribLocation(this.program, 'a_position')
     this.aTexcoordLoc = gl.getAttribLocation(this.program, 'a_texCoord')

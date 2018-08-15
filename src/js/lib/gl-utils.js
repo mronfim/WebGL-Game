@@ -40,3 +40,26 @@ export function createShaderProgram(gl, vertShaderSource, fragShaderSource, vali
 
     return program
 }
+
+/*
+
+let triangleVerts = [
+    0.0, 0.5, 1.0, 1.0, 0.0,
+    -0.5, -0.5, 0.7, 0.0, 1.0,
+    0.5, -0.5, 0.1, 1.0, 0.6
+]
+
+let triangleVBO = gl.createBuffer()
+gl.bindBuffer(gl.ARRAY_BUFFER, triangleVBO)
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVerts), gl.STATIC_DRAW)
+
+let positionAttribLocation = gl.getAttribLocation(program, 'vertPosition')
+let colorAttribLocation = gl.getAttribLocation(program, 'vertColor')
+
+gl.vertexAttribPointer(positionAttribLocation, 2, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 0)
+gl.vertexAttribPointer(colorAttribLocation, 3, gl.FLOAT, gl.FALSE, 5 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT)
+
+gl.enableVertexAttribArray(positionAttribLocation)
+gl.enableVertexAttribArray(colorAttribLocation)
+
+*/
