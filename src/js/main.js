@@ -32,19 +32,23 @@ window.addEventListener('load', () => {
     window.gl = gl
 
     gl.viewport(0, 0, canvas.width, canvas.height)
+    gl.enable(gl.DEPTH_TEST)
+    gl.enable(gl.CULL_FACE)
+    gl.frontFace(gl.CCW)
+    gl.cullFace(gl.BACK)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
     // =============================================
     // Initialize Game Objects
-    
+
     let entities = {}
 
     let player = new Entity()
     player.addComponent(new SpriteComponent('/assets/Sprite-0002.png', spriteVert, spriteFrag))
     player.components.transform.setPosition([-2, 0, 0])
     player.components.transform.setRotation([0, 0, 0])
-    player.components.transform.setScale([4, 4, 1])
+    player.components.transform.setScale([5, 5, 1])
 
     let camera = new Entity()
     camera.addComponent(new CameraComponent(10, 10, [0, 0, -1], [0, 1, 0]))

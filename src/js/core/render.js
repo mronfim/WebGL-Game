@@ -71,10 +71,12 @@ const RenderSystem = (entities) => {
             gl.enableVertexAttribArray(sprite.aPositionLoc)
             gl.vertexAttribPointer(sprite.aPositionLoc, 2, gl.FLOAT, gl.FALSE, 0, 0)
 
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6)
+            gl.drawElements(gl.TRIANGLES, sprite.Indices.length, gl.UNSIGNED_SHORT, 0)
         }
     }
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, null)
+    gl.bindTexture(gl.TEXTURE_2D, null)
     gl.useProgram(null)
     gl.flush()
 }
