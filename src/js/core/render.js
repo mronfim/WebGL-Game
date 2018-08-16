@@ -1,6 +1,12 @@
 import * as glm from 'lib/gl-matrix.js'
 import log from 'node_modules/loglevel'
 
+/*
+
+TODO: Have systems have an init method and an update method
+
+*/
+
 const RenderSystem = (entities) => {
     let gl = window.gl
 
