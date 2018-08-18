@@ -1,38 +1,43 @@
-import * as glm from 'lib/gl-matrix.js'
+import * as glm from 'lib/gl-matrix'
 import log from 'node_modules/loglevel'
 
-/*
+const Render = function Render() {
+    this.worldMatrix = glm.mat4.create()
+    this.viewMatrix = glm.mat4.create()
+    this.projMatrix = glm.mat4.create()
+}
 
-TODO: Have systems have an init method and an update method
+Render.prototype.init = function init(gl){
+    this.gl = gl
+}
 
-*/
-
-const RenderSystem = (entities) => {
-    let gl = window.gl
+Render.prototype.update = function update(components) {
+    let gl = this.gl
 
     // =======================================
     // Setup viewport
 
-    let worldMatrix = glm.mat4.create()
-    let viewMatrix = glm.mat4.create()
-    let projMatrix = glm.mat4.create()
-
-    let camera = entities.camera
+    let camera = components.camera && components.camera[0]
     if (!camera) {
         log.warn('WARNING no camera found!')
 
         // Set the world/view/proj matrices as the identity matrix when no camera present
-        glm.mat4.identity(worldMatrix)
-        glm.mat4.identity(viewMatrix)
-        glm.mat4.identity(projMatrix)
+        glm.mat4.identity(this.worldMatrix)
+        glm.mat4.identity(this.viewMatrix)
+        glm.mat4.identity(this.projMatrix)
     } else {
-        let transform = camera.components.transform
+        let transform = camera.transform
         let cameraComponent = camera.components.camera
         let target = glm.vec3.create()
         glm.vec3.add(target, transform.position, cameraComponent.direction)
-        glm.mat4.identity(worldMatrix)
-        glm.mat4.lookAt(viewMatrix, transform.position, target, cameraComponent.up)
-        glm.mat4.ortho(projMatrix, -1 * cameraComponent.halfWidth, cameraComponent.halfWidth, -1 * cameraComponent.halfHeight, cameraComponent.halfHeight, 0, 10)
+        glm.mat4.identity(this.worldMatrix)
+        glm.mat4.lookAt(this.viewMatrix, transform.position, target, cameraComponent.up)
+        glm.mat4.ortho(this.projMatrix,
+            -1 * cameraComponent.halfWidth,
+            cameraComponent.halfWidth,
+            -1 * cameraComponent.halfHeight,
+            cameraComponent.halfHeight,
+            0, 10)
     }
 
     // =======================================
@@ -41,16 +46,17 @@ const RenderSystem = (entities) => {
     gl.clearColor(0.75, 0.85, 0.8, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-    for (var entityId in entities) {
+    let transform = null
+    let sprite = null
 
-        let entity = entities[entityId]
-        let transform = entity.components.transform
-        let sprite = entity.components.sprite
+    components.sprite.forEach(entity => {
+        transform = entity.transform
+        sprite = entity.components.sprite
 
         // calculate world matrix
-        glm.mat4.translate(worldMatrix, worldMatrix, transform.position)
-        glm.mat4.rotateZ(worldMatrix, worldMatrix, transform.rotation[2] * Math.PI / 180)
-        glm.mat4.scale(worldMatrix, worldMatrix, transform.scale)
+        glm.mat4.translate(this.worldMatrix, this.worldMatrix, transform.position)
+        glm.mat4.rotateZ(this.worldMatrix, this.worldMatrix, transform.rotation[2] * Math.PI / 180)
+        glm.mat4.scale(this.worldMatrix, this.worldMatrix, transform.scale)
 
         if (sprite && sprite.isLoaded) {
             gl.useProgram(sprite.program)
@@ -61,9 +67,9 @@ const RenderSystem = (entities) => {
             let matProjUniformLocation = gl.getUniformLocation(sprite.program, 'mProj')
 
             // Set proj/view/world matrix data
-            gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix)
-            gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix)
-            gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix)
+            gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.worldMatrix)
+            gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, this.viewMatrix)
+            gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, this.projMatrix)
 
             gl.activeTexture(gl.TEXTURE0)
             gl.bindTexture(gl.TEXTURE_2D, sprite.gl_tex)
@@ -79,7 +85,7 @@ const RenderSystem = (entities) => {
 
             gl.drawElements(gl.TRIANGLES, sprite.Indices.length, gl.UNSIGNED_SHORT, 0)
         }
-    }
+    })
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null)
     gl.bindTexture(gl.TEXTURE_2D, null)
@@ -87,4 +93,4 @@ const RenderSystem = (entities) => {
     gl.flush()
 }
 
-export default RenderSystem
+export default Render

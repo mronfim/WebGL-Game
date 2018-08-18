@@ -2,12 +2,13 @@ import {
     createShaderProgram,
 } from 'lib/gl-utils.js'
 
-import * as glm from 'lib/gl-matrix.js'
+import * as glm from 'lib/gl-matrix'
 
-import Entity from 'core/entity.js'
-import SpriteComponent from 'core/sprite.js'
-import CameraComponent from 'core/camera.js'
-import RenderSystem from 'core/render.js'
+import Entity from 'core/entity'
+// import SpriteComponent from 'core/components/sprite.js'
+// import CameraComponent from 'core/components/camera.js'
+import Components from 'core/components'
+import Systems from 'core/systems'
 
 import spriteVert from 'shaders/spriteVert.glsl'
 import spriteFrag from 'shaders/spriteFrag.glsl'
@@ -40,31 +41,32 @@ window.addEventListener('load', () => {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
     // =============================================
-    // Initialize Game Objects
+    // Initialize Game Systems
+
+    Systems.Render.init(gl)
+
+    // =============================================
+    // Initialize Game Entities
 
     let entities = {}
+    let components = {}
 
-    let player = new Entity()
-    player.addComponent(new SpriteComponent('/assets/Sprite-0002.png', spriteVert, spriteFrag))
-    player.components.transform.setPosition([-2, 0, 0])
-    player.components.transform.setRotation([0, 0, 0])
-    player.components.transform.setScale([5, 5, 1])
+    let player = new Entity(entities)
+    player.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
+    player.transform.setPosition([-2, 0, 0])
+    player.transform.setRotation([0, 0, 0])
+    player.transform.setScale([5, 5, 1])
 
-    let camera = new Entity()
-    camera.addComponent(new CameraComponent(10, 10, [0, 0, -1], [0, 1, 0]))
-    camera.components.transform.setPosition([0, 0, 5])
-
-    entities[player.id] = player
-    entities['camera'] = camera
+    let camera = new Entity(entities)
+    camera.addComponent(components, new Components.Camera(10, 10, [0, 0, -1], [0, 1, 0]))
+    camera.transform.setPosition([0, 0, 5])
 
     // =============================================
     // Main loop
 
-    console.log(player)
-
     function loop() {
 
-        RenderSystem(entities)
+        Systems.Render.update(components)
 
         requestAnimationFrame(loop)
     }

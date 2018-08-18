@@ -1,4 +1,4 @@
-import * as glm from 'lib/gl-matrix.js'
+import * as glm from 'lib/gl-matrix'
 
 const TransformComponent = function TransformComponent() {
     this.position = glm.vec3.create()

@@ -1,4 +1,4 @@
-import { createShaderProgram } from 'lib/gl-utils.js'
+import { createShaderProgram } from 'lib/gl-utils'
 
 const SpriteComponent = function SpriteComponent(url, vs, fs) {
     this.url = url

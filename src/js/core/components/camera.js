@@ -1,4 +1,4 @@
-import * as glm from 'lib/gl-matrix.js'
+import * as glm from 'lib/gl-matrix'
 
 const CameraComponent = function CameraComponent(width, height, direction, up) {
     this.halfWidth = (width / 2) || 5
