@@ -50,22 +50,22 @@ SpriteComponent.prototype.setup = function setup() {
 SpriteComponent.prototype.Vertices = new Float32Array([
     -0.5, -0.5,
     0.5, -0.5,
-    -0.5, 0.5,
     0.5, 0.5,
+    -0.5, 0.5,
 ])
 
 SpriteComponent.prototype.TextureUV = new Float32Array([
     0, 0,
     1, 0,
-    0, 1,
     1, 1,
-    1, 0,
     0, 1,
+    1, 0,
+    1, 1,
 ])
 
 SpriteComponent.prototype.Indices = new Uint16Array([
-    0, 1, 2,
-    2, 1, 3,
+    0, 1, 3,
+    3, 1, 2,
 ])
 
 SpriteComponent.prototype.name = 'sprite'
