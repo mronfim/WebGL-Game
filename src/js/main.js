@@ -64,19 +64,21 @@ window.addEventListener('load', () => {
     block.transform.setScale([1, 1, 1])
     block.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
     block.addComponent(components, new Components.Collidable(new AABB(block.transform)))
+    block.addComponent(components, new Components.Selectable(block.id))
     
     let block2 = new Entity(entities)
     block2.transform.setPosition([2, 2, 0])
     block2.transform.setScale([2, 2, 1])
     block2.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
     block2.addComponent(components, new Components.Collidable(new AABB(block2.transform)))
+    block2.addComponent(components, new Components.Selectable(block2.id))
 
     let camera = new Entity(entities)
     camera.transform.setPosition([0, 0, 5])
     camera.addComponent(components, new Components.Camera(10, 10, [0, 0, -1], [0, 1, 0]))
     
     // =============================================
-    // Main loop
+    // Main loops
 
     function loop() {
 
@@ -97,10 +99,30 @@ window.addEventListener('load', () => {
 
         gl.readPixels(point.x, point.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
 
-        // console.log(pixels)
-
         let entityId = Components.Selectable.getEntityId(pixels)
         console.log(`[DEBUG] Entity Selected (id): ${entityId}`)
+
+        if (entityId) {
+            entities[entityId].components.selectable.selected = true
+            entities.selected = entities[entityId]
+        }
+    }
+
+    canvas.onmouseup = event => {
+        Components.Selectable.resetSelectedStates()
+        entities.selected = undefined
+    }
+
+    canvas.onmousemove = event => {
+        let selectedEntity = entities.selected
+
+        if (selectedEntity) {
+            // let displacement = canvasCoordToGLCoord(event, canvas, event.movementX, event.movementY)
+            let x = event.movementX / canvas.width * camera.components.camera.halfWidth * 2
+            let y = -event.movementY / canvas.height * camera.components.camera.halfHeight * 2
+            // console.log(displacement)
+            selectedEntity.transform.move([x, y])
+        }
     }
     
     requestAnimationFrame(loop)
@@ -114,5 +136,29 @@ function getCanvasCoord(event, canvas) {
     x = x - rect.left
     y = rect.bottom - y
 
-    return {x: x, y: y}
+    return { x: x, y: y }
 }
+
+function pixelInputToGLCoord(event, canvas) {
+    let x = event.clientX
+    let y = event.clientY
+    let midX = canvas.width / 2
+    let midY = canvas.height / 2
+    let rect = event.target.getBoundingClientRect()
+
+    x = ((x - rect.left) - midX) / midX
+    y = (midY - (y - rect.top)) / midY
+
+    return { x: x, y: y }
+}
+
+// function canvasCoordToGLCoord(event, canvas, x, y) {
+//     let midX = canvas.width / 2
+//     let midY = canvas.height / 2
+//     let rect = event.target.getBoundingClientRect()
+
+//     let glX = ((x - rect.left) - midX) / midX
+//     let glY = (midY - (y - rect.top)) / midY
+
+//     return { x: glX, y: glY }
+// }

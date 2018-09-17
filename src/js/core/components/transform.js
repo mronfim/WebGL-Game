@@ -19,4 +19,9 @@ export default class TransformComponent {
     setScale(scale) {
         this.scale = new Float32Array(scale)
     }
+
+    move(displacement) {
+        this.position[0] += displacement[0]
+        this.position[1] += displacement[1]
+    }
 }
