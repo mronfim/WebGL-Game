@@ -57,6 +57,7 @@ window.addEventListener('load', () => {
     player.transform.setRotation([0, 0, 0])
     player.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
     player.addComponent(components, new Components.Collidable( new AABB(player.transform) ))
+    player.addComponent(components, new Components.Selectable(player.id))
 
     let block = new Entity(entities)
     block.transform.setPosition([-0.5, 0, 0])
@@ -84,6 +85,34 @@ window.addEventListener('load', () => {
 
         requestAnimationFrame(loop)
     }
+
+    // =============================================
+    // Event handler for clicking on entities
+
+    canvas.onmousedown = event => {
+        Systems.Render.drawToTexture(components)
+        
+        let point = getCanvasCoord(event, canvas)
+        let pixels = new Uint8Array(4)
+
+        gl.readPixels(point.x, point.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
+
+        // console.log(pixels)
+
+        let entityId = Components.Selectable.getEntityId(pixels)
+        console.log(`[DEBUG] Entity Selected (id): ${entityId}`)
+    }
     
     requestAnimationFrame(loop)
 })
+
+function getCanvasCoord(event, canvas) {
+    let x = event.clientX
+    let y = event.clientY
+    let rect = event.target.getBoundingClientRect()
+
+    x = x - rect.left
+    y = rect.bottom - y
+
+    return {x: x, y: y}
+}

@@ -4,6 +4,7 @@ import log from 'node_modules/loglevel'
 import { createShaderProgram } from 'lib/gl-utils'
 import vert from 'shaders/vertex.glsl'
 import frag from 'shaders/fragment.glsl'
+import selectableFrag from 'shaders/selectableFrag.glsl'
 
 export default class Render {
     constructor() {
@@ -17,15 +18,13 @@ export default class Render {
         this.outlineProgram = createShaderProgram(gl, vert, frag)
         this.outline_aPositionLoc = gl.getAttribLocation(this.outlineProgram, 'a_position')
         this.lineColorLocation = gl.getUniformLocation(this.outlineProgram, 'color')
+
+        this.selectableProgram = createShaderProgram(gl, vert, selectableFrag)
+        this.selectable_aPositionLoc = gl.getAttribLocation(this.selectableProgram, 'a_position')
+        this.selectableColorLoc = gl.getUniformLocation(this.selectableProgram, 'color')
     }
 
-    update(components) {
-        let gl = this.gl
-
-        // =======================================
-        // Setup viewport
-
-        let camera = components.camera && components.camera[0]
+    setupViewport(camera) {
         if (!camera) {
             log.warn('WARNING no camera found!')
 
@@ -36,6 +35,7 @@ export default class Render {
             let transform = camera.transform
             let cameraComponent = camera.components.camera
             let target = glm.vec3.create()
+            
             glm.vec3.add(target, transform.position, cameraComponent.direction)
             glm.mat4.lookAt(this.viewMatrix, transform.position, target, cameraComponent.up)
             glm.mat4.ortho(this.projMatrix,
@@ -45,6 +45,16 @@ export default class Render {
                 cameraComponent.halfHeight,
                 0, 10)
         }
+    }
+
+    update(components) {
+        let gl = this.gl
+
+        // =======================================
+        // Setup viewport
+
+        let camera = components.camera && components.camera[0]
+        this.setupViewport(camera)
 
         // =======================================
         // Clear background and render
@@ -130,5 +140,68 @@ export default class Render {
         gl.vertexAttribPointer(this.outline_aPositionLoc, 2, gl.FLOAT, gl.FALSE, 0, 0)
 
         gl.drawArrays(gl.LINE_LOOP, 0, 4)
+    }
+
+    // TODO: Right now all vertice info is comming from sprite component
+    //      So an entity that has a selectable component has to have a sprite component
+    //      FIX THIS
+    drawToTexture(components) {
+        let gl = this.gl
+
+        // =======================================
+        // Setup viewport
+
+        let camera = components.camera && components.camera[0]
+        this.setupViewport(camera)
+
+        // =======================================
+        // Clear background and render
+
+        gl.clearColor(0.75, 0.85, 0.8, 1.0)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+        let transform = null
+        let sprite = null
+        let selectable = null
+
+        components.selectable.forEach(entity => {
+            transform = entity.transform
+            sprite = entity.components.sprite
+            selectable = entity.components.selectable
+
+            // calculate world matrix
+            glm.mat4.identity(this.worldMatrix)
+            glm.mat4.translate(this.worldMatrix, this.worldMatrix, transform.position)
+            glm.mat4.rotateZ(this.worldMatrix, this.worldMatrix, transform.rotation[2] * Math.PI / 180)
+            glm.mat4.scale(this.worldMatrix, this.worldMatrix, transform.scale)
+
+            if (selectable) {
+                gl.useProgram(this.selectableProgram)
+
+                // Get proj/view/world matrix locations
+                let matWorldUniformLocation = gl.getUniformLocation(this.selectableProgram, 'mWorld')
+                let matViewUniformLocation = gl.getUniformLocation(this.selectableProgram, 'mView')
+                let matProjUniformLocation = gl.getUniformLocation(this.selectableProgram, 'mProj')
+
+                // Set proj/view/world matrix data
+                gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.worldMatrix)
+                gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, this.viewMatrix)
+                gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, this.projMatrix)
+
+                // Set color
+                let color = entity.components.selectable.color
+                gl.uniform4f(this.selectableColorLoc, color[0], color[1], color[2], color[3])
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, entity.components.sprite.geo_buff)
+                gl.enableVertexAttribArray(this.selectable_aPositionLoc)
+                gl.vertexAttribPointer(this.selectable_aPositionLoc, 2, gl.FLOAT, gl.FALSE, 0, 0)
+
+                gl.drawElements(gl.TRIANGLES, sprite.Indices.length, gl.UNSIGNED_SHORT, 0)
+            }
+        })
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, null)
+        gl.bindTexture(gl.TEXTURE_2D, null)
+        gl.useProgram(null)
     }
 }
