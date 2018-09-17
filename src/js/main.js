@@ -9,6 +9,7 @@ import Components from 'core/components'
 import Systems from 'core/systems'
 
 import AABB from 'core/physics/AABB'
+import OBB from 'core/physics/OBB'
 
 import spriteVert from 'shaders/spriteVert.glsl'
 import spriteFrag from 'shaders/spriteFrag.glsl'
@@ -51,31 +52,35 @@ window.addEventListener('load', () => {
     let entities = {}
     let components = {}
 
+    let aspectRatio = canvas.height / canvas.width
+    let w = 20
+    let h = w * aspectRatio
+
+    let camera = new Entity(entities)
+    camera.transform.setPosition([0, 0, 5])
+    camera.addComponent(components, new Components.Camera(w, h, [0, 0, -1], [0, 1, 0]))
+
     let player = new Entity(entities)
     player.transform.setPosition([-2, 0, 0])
-    player.transform.setScale([3, 3, 1])
-    player.transform.setRotation([0, 0, 0])
+    player.transform.setScale([3, 3, 0.1])
+    player.transform.setRotation([0, 0, 45])
     player.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
-    player.addComponent(components, new Components.Collidable( new AABB(player.transform) ))
+    player.addComponent(components, new Components.Collidable( new OBB(player.transform) ))
     player.addComponent(components, new Components.Selectable(player.id))
 
     let block = new Entity(entities)
     block.transform.setPosition([-0.5, 0, 0])
-    block.transform.setScale([1, 1, 1])
-    block.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
-    block.addComponent(components, new Components.Collidable(new AABB(block.transform)))
+    block.transform.setScale([1, 1, 0.1])
+    block.addComponent(components, new Components.Sprite('/assets/Sprite-0003.png', spriteVert, spriteFrag))
+    block.addComponent(components, new Components.Collidable(new OBB(block.transform)))
     block.addComponent(components, new Components.Selectable(block.id))
     
     let block2 = new Entity(entities)
     block2.transform.setPosition([2, 2, 0])
-    block2.transform.setScale([2, 2, 1])
-    block2.addComponent(components, new Components.Sprite('/assets/Sprite-0002.png', spriteVert, spriteFrag))
-    block2.addComponent(components, new Components.Collidable(new AABB(block2.transform)))
+    block2.transform.setScale([1, 1, 0.1])
+    block2.addComponent(components, new Components.Sprite('/assets/Sprite-0004.png', spriteVert, spriteFrag))
+    block2.addComponent(components, new Components.Collidable(new OBB(block2.transform)))
     block2.addComponent(components, new Components.Selectable(block2.id))
-
-    let camera = new Entity(entities)
-    camera.transform.setPosition([0, 0, 5])
-    camera.addComponent(components, new Components.Camera(10, 10, [0, 0, -1], [0, 1, 0]))
     
     // =============================================
     // Main loops
@@ -124,6 +129,8 @@ window.addEventListener('load', () => {
             selectedEntity.transform.move([x, y])
         }
     }
+
+    console.log(gl.getParameter(gl.VIEWPORT))
     
     requestAnimationFrame(loop)
 })
@@ -151,14 +158,3 @@ function pixelInputToGLCoord(event, canvas) {
 
     return { x: x, y: y }
 }
-
-// function canvasCoordToGLCoord(event, canvas, x, y) {
-//     let midX = canvas.width / 2
-//     let midY = canvas.height / 2
-//     let rect = event.target.getBoundingClientRect()
-
-//     let glX = ((x - rect.left) - midX) / midX
-//     let glY = (midY - (y - rect.top)) / midY
-
-//     return { x: glX, y: glY }
-// }

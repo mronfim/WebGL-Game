@@ -135,16 +135,13 @@ export default class Render {
         gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, this.viewMatrix)
         gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, this.projMatrix)
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, entity.components.sprite.geo_buff)
+        gl.bindBuffer(gl.ARRAY_BUFFER, collidable.geo_buff)
         gl.enableVertexAttribArray(this.outline_aPositionLoc)
         gl.vertexAttribPointer(this.outline_aPositionLoc, 2, gl.FLOAT, gl.FALSE, 0, 0)
 
         gl.drawArrays(gl.LINE_LOOP, 0, 4)
     }
-
-    // TODO: Right now all vertice info is comming from sprite component
-    //      So an entity that has a selectable component has to have a sprite component
-    //      FIX THIS
+    
     drawToTexture(components) {
         let gl = this.gl
 
